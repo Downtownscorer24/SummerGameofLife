@@ -6,7 +6,7 @@ COLOR_BG = (10, 10, 10)
 COLOR_GRID = (40, 40, 40)
 COLOR_DIE_NEXT = (170, 170, 170)
 COLOR_ALIVE_NEXT = (255, 255, 255)
-
+COLOR_DEAD = (0, 0, 0)
 
 def update(screen, cells, size, with_progress=False):
     updated_cells = np.zeros((cells.shape[0], cells.shape[1]))
@@ -47,6 +47,7 @@ def main():
     pygame.display.update()
 
     running = False
+    cell_deactivation = False
 
     while True:
         for event in pygame.event.get():
@@ -58,9 +59,14 @@ def main():
                     running = not running
                     update(screen, cells, 10)
                     pygame.display.update()
+                elif event.key == pygame.K_d:
+                    cell_deactivation = not cell_deactivation
             if pygame.mouse.get_pressed()[0]:
                 pos = pygame.mouse.get_pos()
-                cells[pos[1] // 10, pos[0] // 10] =1
+                if cell_deactivation:
+                    cells[pos[1] // 10, pos[0] // 10] = 0
+                else:
+                    cells[pos[1] // 10, pos[0] // 10] = 1
                 update(screen, cells, 10)
                 pygame.display.update()
 
@@ -71,12 +77,6 @@ def main():
             pygame.display.update()
 
         time.sleep(0.001)
+
 if __name__ == '__main__':
     main()
-
-
-
-
-
-
-

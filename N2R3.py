@@ -47,6 +47,7 @@ def main():
     pygame.display.update()
 
     running = False
+    cell_deactivation = False
 
     while True:
         for event in pygame.event.get():
@@ -58,9 +59,14 @@ def main():
                     running = not running
                     update(screen, cells, 10)
                     pygame.display.update()
+                elif event.key == pygame.K_d:
+                    cell_deactivation = not cell_deactivation
             if pygame.mouse.get_pressed()[0]:
                 pos = pygame.mouse.get_pos()
-                cells[pos[1] // 10, pos[0] // 10] =1
+                if cell_deactivation:
+                    cells[pos[1] // 10, pos[0] // 10] = 0
+                else:
+                    cells[pos[1] // 10, pos[0] // 10] = 1
                 update(screen, cells, 10)
                 pygame.display.update()
 
