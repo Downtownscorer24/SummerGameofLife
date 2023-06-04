@@ -49,6 +49,10 @@ def main():
     cell_size = 10
     cells = np.zeros((rows, cols))
     screen.fill(COLOR_GRID)
+    for x in range(0, 800, cell_size):
+        pygame.draw.line(screen, (70, 70, 70), (x, 0), (x, 600))
+    for y in range(0, 600, cell_size):
+        pygame.draw.line(screen, (70, 70, 70), (0, y), (800, y))
 
     pygame.display.flip()
     pygame.display.update()
@@ -67,23 +71,18 @@ def main():
                     running = not running
                 elif event.key == pygame.K_d:
                     cell_deactivation = not cell_deactivation
-                elif event.key == pygame.K_RETURN:
+                elif event.key == pygame.K_RETURN and not running:
                     try:
                         input_generation = int(input("Enter the generation to navigate: "))
-                        if input_generation > current_generation:
-                            for _ in range(input_generation - current_generation):
+                        if input_generation >= 0:
+                            while current_generation < input_generation:
                                 cells = update(screen, cells, cell_size, with_progress=True)
                                 current_generation += 1
                                 draw_generation_counter(screen, current_generation)
                                 pygame.display.update()
-                        else:
-                            cells = np.zeros((rows, cols))
-                            current_generation = 0
-                            screen.fill(COLOR_GRID)
                             draw_generation_counter(screen, current_generation)
-                            pygame.display.update()
-                            running = False
-                            cell_deactivation = False
+                        else:
+                            print("Invalid input. Please enter a non-negative generation number.")
                     except ValueError:
                         print("Invalid input. Please enter a valid generation number.")
 
@@ -91,10 +90,12 @@ def main():
                 pos = pygame.mouse.get_pos()
                 if cell_deactivation:
                     cells[pos[1] // cell_size, pos[0] // cell_size] = 0
+                    pygame.draw.rect(screen, COLOR_DEAD,
+                                     (pos[0] // cell_size * cell_size, pos[1] // cell_size * cell_size, cell_size - 1, cell_size - 1))
                 else:
                     cells[pos[1] // cell_size, pos[0] // cell_size] = 1
-                pygame.draw.rect(screen, COLOR_ALIVE_NEXT if cells[pos[1] // cell_size, pos[0] // cell_size] == 1 else COLOR_DEAD,
-                                 (pos[0] // cell_size * cell_size, pos[1] // cell_size * cell_size, cell_size - 1, cell_size - 1))
+                    pygame.draw.rect(screen, COLOR_ALIVE_NEXT,
+                                     (pos[0] // cell_size * cell_size, pos[1] // cell_size * cell_size, cell_size - 1, cell_size - 1))
                 pygame.display.update()
 
         screen.fill(COLOR_GRID)
