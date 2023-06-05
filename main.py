@@ -1,3 +1,7 @@
+# This is a normal version of the game of life
+# Click cells to make alive and set initial configuration
+# Press 'd' if you want to shift into setting cells dead. Make sure to click 'd' again to switch to setting cells alive
+
 import time
 import pygame
 import numpy as np

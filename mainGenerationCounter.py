@@ -1,3 +1,6 @@
+#This version adds a generation counter at the top to allow the user to see which generation the simulation is on
+# Press 'd' if you want to shift into setting cells dead. Make sure to click 'd' again to switch to setting cells alive
+
 import time
 import pygame
 import numpy as np

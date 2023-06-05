@@ -1,3 +1,11 @@
+# There is one big difference in this version
+# 1. The "neighborhood" of each cells is now 2-pixels outward, as opposed to 1-pixel in the complete normal version
+# 2. Now that the 'neighborhood" of cells has increased from 8 to 24, all the rules have been multiplied by three, hence the R3 in the name
+# This means that to die, "neighborhood" cells must be less that six or greater than 9, since it was previously 2 and 3.
+# To stay alive, the window is "neighborhood" cells must be within 6 and 9, both inclusive.
+# To become alive, any dead cells with [6,9] neighbors become alive
+# Press 'd' if you want to shift into setting cells dead. Make sure to click 'd' again to switch to setting cells alive
+
 import time
 import pygame
 import numpy as np

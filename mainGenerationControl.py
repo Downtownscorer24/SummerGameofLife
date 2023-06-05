@@ -1,3 +1,8 @@
+#This version is meant to add some features
+# 1. ALlow user to see which generation the simulation is on
+# 2. Allow user to input a new generation for the simulation to automatically jump to
+# This is still in the works!!!
+
 import time
 import pygame
 import numpy as np
@@ -35,10 +40,11 @@ def update(screen, cells, size, with_progress=False):
     return updated_cells
 
 
-def draw_generation_counter(screen, current_generation):
-    font = pygame.font.Font(None, 36)
-    text = font.render("Generation: {}".format(current_generation), True, (255, 255, 255))
-    screen.blit(text, (10, 10))
+def draw_grid(screen, size, rows, cols):
+    screen.fill(COLOR_GRID)
+    for row in range(rows):
+        for col in range(cols):
+            pygame.draw.rect(screen, COLOR_DEAD, (col * size, row * size, size - 1, size - 1), 1)
 
 
 def main():
@@ -46,20 +52,17 @@ def main():
     screen = pygame.display.set_mode((800, 600))
 
     rows, cols = 60, 80
-    cell_size = 10
+    size = 10
     cells = np.zeros((rows, cols))
-    screen.fill(COLOR_GRID)
-    for x in range(0, 800, cell_size):
-        pygame.draw.line(screen, (70, 70, 70), (x, 0), (x, 600))
-    for y in range(0, 600, cell_size):
-        pygame.draw.line(screen, (70, 70, 70), (0, y), (800, y))
+    draw_grid(screen, size, rows, cols)
 
     pygame.display.flip()
     pygame.display.update()
 
     running = False
     cell_deactivation = False
-    current_generation = 0
+    generation = 0
+    updated_cells = cells.copy()
 
     while True:
         for event in pygame.event.get():
@@ -69,45 +72,37 @@ def main():
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     running = not running
+                    if running:
+                        generation = 0
+                        updated_cells = cells.copy()
                 elif event.key == pygame.K_d:
                     cell_deactivation = not cell_deactivation
-                elif event.key == pygame.K_RETURN and not running:
-                    try:
-                        input_generation = int(input("Enter the generation to navigate: "))
-                        if input_generation >= 0:
-                            while current_generation < input_generation:
-                                cells = update(screen, cells, cell_size, with_progress=True)
-                                current_generation += 1
-                                draw_generation_counter(screen, current_generation)
-                                pygame.display.update()
-                            draw_generation_counter(screen, current_generation)
-                        else:
-                            print("Invalid input. Please enter a non-negative generation number.")
-                    except ValueError:
-                        print("Invalid input. Please enter a valid generation number.")
+                elif event.key == pygame.K_RETURN:
+                    if not running:
+                        try:
+                            generation = int(input("Enter the desired generation: "))
+                            generation = max(generation, 0)
+                            for _ in range(generation):
+                                updated_cells = update(screen, updated_cells, size, with_progress=True)
+                        except ValueError:
+                            print("Invalid input. Please enter a valid generation number.")
 
             if pygame.mouse.get_pressed()[0]:
                 pos = pygame.mouse.get_pos()
-                if cell_deactivation:
-                    cells[pos[1] // cell_size, pos[0] // cell_size] = 0
-                    pygame.draw.rect(screen, COLOR_DEAD,
-                                     (pos[0] // cell_size * cell_size, pos[1] // cell_size * cell_size, cell_size - 1, cell_size - 1))
-                else:
-                    cells[pos[1] // cell_size, pos[0] // cell_size] = 1
-                    pygame.draw.rect(screen, COLOR_ALIVE_NEXT,
-                                     (pos[0] // cell_size * cell_size, pos[1] // cell_size * cell_size, cell_size - 1, cell_size - 1))
-                pygame.display.update()
-
-        screen.fill(COLOR_GRID)
+                if not running:
+                    if cell_deactivation:
+                        updated_cells[pos[1] // size, pos[0] // size] = 0
+                    else:
+                        updated_cells[pos[1] // size, pos[0] // size] = 1
+                    draw_grid(screen, size, rows, cols)
+                    pygame.display.update()
 
         if running:
-            cells = update(screen, cells, cell_size, with_progress=True)
-            current_generation += 1
-            draw_generation_counter(screen, current_generation)
+            updated_cells = update(screen, updated_cells, size, with_progress=True)
+            generation += 1
             pygame.display.update()
 
         time.sleep(0.001)
-
 
 if __name__ == '__main__':
     main()
