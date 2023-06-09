@@ -1,5 +1,5 @@
 # There is one big difference in this version
-# 1. The "neighborhood" of each cell is now 3-pixels outward, as opposed to 1-pixel in the complete normal version
+# 1. The "neighborhood" of each cell is now 2-pixels outward, as opposed to 1-pixel in the complete normal version
 # 2. The rules for staying alive, dying, or becoming alive still stay the same
 # Press 'd' if you want to shift into setting cells dead. Make sure to click 'd' again to switch to setting cells alive
 
