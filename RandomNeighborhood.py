@@ -2,7 +2,7 @@
 # Probabilities and a random number [0,1] determine which neighborhood size a cell has for the generation
 # These probabilities can be adjusted according to the user, but the sum mustn't exceed 1
 # For example, if the probability of a 1-pixel neighborhood size is 0.7, then there is a 70% chance that a cell has a
-# 1-pixel neighborhood size for any generation during the simulation
+# 1-pixel neighborhood size for any generation during the simulation.
 # The initial configuration can be set by clicking/dragging cells at the start
 # Press 'd' if you want to shift into setting cells dead. Make sure to click 'd' again to switch to setting cells alive
 
