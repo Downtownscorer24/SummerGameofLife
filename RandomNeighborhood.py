@@ -1,14 +1,3 @@
-# This is version of GoL introduces randomness into the neighborhood of each cell
-# At every generation, each cell's neighborhood is random, so it might be 1, 2, or 3 pixels outward
-# Right now, there are three possibilities
-# 1. The chance of a cell having a 1 pixel neighborhood is 0.7, as denoted by one_prob
-# 2. The chance of a cell having a 2 pixel neighborhood is two_prob * (1 - one_prob), which would be 0.2 in this case
-# 3. The chance of a cell having a 3 pixel neighborhood is simply 1 - one_prob - (two_prob * (1 - one_prob))
-# one_prob + two_prob doesn't have to equal 1. For example, if one_prob = 0.8, and two_prob = 0.8, then the chances of a
-# two pixel neighborhood are 0.2 * 0.8
-# Click cells to make alive and set initial configuration
-# Press 'd' if you want to shift into setting cells dead. Make sure to click 'd' again to switch to setting cells alive
-
 import time
 import pygame
 import numpy as np
@@ -20,34 +9,30 @@ COLOR_DIE_NEXT = (170, 170, 170)
 COLOR_ALIVE_NEXT = (255, 255, 255)
 COLOR_DEAD = (0, 0, 0)
 
-one_prob = 0.7
-two_prob = 2/3
-
 
 def update(screen, cells, size, with_progress=False):
     updated_cells = np.zeros((cells.shape[0], cells.shape[1]))
 
     for row, col in np.ndindex(cells.shape):
-        if random.random() < one_prob:
-            alive = np.sum(cells[row-1:row+2, col-1:col+2]) - cells[row, col]
-            color = COLOR_BG if cells[row, col] == 0 else COLOR_ALIVE_NEXT
-
-        elif random.random() < two_prob:
-            alive = np.sum(cells[row - 2:row + 3, col - 2:col + 3]) - cells[row, col]
-            color = COLOR_BG if cells[row, col] == 0 else COLOR_ALIVE_NEXT
-
+        if random.random() < 0.7:
+            neighborhood_size = 1
+        elif random.random() < 0.2:
+            neighborhood_size = 2
         else:
-            alive = np.sum(cells[row - 3:row + 4, col - 3:col + 4]) - cells[row, col]
-            color = COLOR_BG if cells[row, col] == 0 else COLOR_ALIVE_NEXT
+            neighborhood_size = 3
+
+        alive = np.sum(cells[row - neighborhood_size:row + neighborhood_size + 1,
+                        col - neighborhood_size:col + neighborhood_size + 1]) - cells[row, col]
+        color = COLOR_BG if cells[row, col] == 0 else COLOR_ALIVE_NEXT
 
         if cells[row, col] == 1:
-           if alive < 2 or alive > 3:
-               if with_progress:
-                   color = COLOR_DIE_NEXT
-           elif 2 <= alive <= 3:
-               updated_cells[row, col] = 1
-               if with_progress:
-                   color = COLOR_ALIVE_NEXT
+            if alive < 2 or alive > 3:
+                if with_progress:
+                    color = COLOR_DIE_NEXT
+            elif 2 <= alive <= 3:
+                updated_cells[row, col] = 1
+                if with_progress:
+                    color = COLOR_ALIVE_NEXT
 
         else:
             if alive == 3:
@@ -55,7 +40,7 @@ def update(screen, cells, size, with_progress=False):
                 if with_progress:
                     color = COLOR_ALIVE_NEXT
 
-        pygame.draw.rect(screen, color,(col * size, row * size, size -1, size - 1))
+        pygame.draw.rect(screen, color, (col * size, row * size, size - 1, size - 1))
 
     return updated_cells
 
@@ -102,6 +87,7 @@ def main():
             pygame.display.update()
 
         time.sleep(0.001)
+
 
 if __name__ == '__main__':
     main()
