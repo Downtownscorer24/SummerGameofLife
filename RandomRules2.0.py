@@ -1,7 +1,7 @@
 # This version of GoL introduces randomness to the rules of the game (deaths, births, staying alive)
 # In this version, survival probability is dependent on the death probability, and birth probability is seperate
 # The current rules still add some effect
-# For example, to stay alive, you must need to have neighbors within [2,3] AND the probability
+# For example, to stay alive, you must need to have neighbors within [2,3] OR the probability
 # must fall in the cell's favor.
 # Click cells to make alive and set initial configuration
 # Press 'd' if you want to shift into setting cells dead. Make sure to click 'd' again to switch to setting cells alive
@@ -17,9 +17,9 @@ COLOR_DIE_NEXT = (170, 170, 170)
 COLOR_ALIVE_NEXT = (255, 255, 255)
 COLOR_DEAD = (0, 0, 0)
 
-death_prob = 0.99
+death_prob = 0.9
 survival_prob = 1 - death_prob
-birth_prob = 0.01
+birth_prob = 0.02
 
 def update(screen, cells, size, death_prob, survival_prob, birth_prob, with_progress=False):
     updated_cells = np.zeros((cells.shape[0], cells.shape[1]))

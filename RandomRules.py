@@ -17,9 +17,9 @@ COLOR_DIE_NEXT = (170, 170, 170)
 COLOR_ALIVE_NEXT = (255, 255, 255)
 COLOR_DEAD = (0, 0, 0)
 
-death_prob = 0.02
+death_prob = 0.1
 survival_prob = 1 - death_prob
-birth_prob = 0.5
+birth_prob = 0.3
 
 def update(screen, cells, size, death_prob, survival_prob, birth_prob, with_progress=False):
     updated_cells = np.zeros((cells.shape[0], cells.shape[1]))

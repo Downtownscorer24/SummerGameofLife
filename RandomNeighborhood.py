@@ -22,9 +22,9 @@ def update(screen, cells, size, with_progress=False):
     updated_cells = np.zeros((cells.shape[0], cells.shape[1]))
 
     for row, col in np.ndindex(cells.shape):
-        if random.random() < 0.7:
+        if random.random() < 0.99:
             neighborhood_size = 1
-        elif random.random() < 0.2:
+        elif random.random() < 0.006:
             neighborhood_size = 2
         else:
             neighborhood_size = 3
