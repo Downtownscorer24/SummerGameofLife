@@ -1,15 +1,6 @@
-# This version of GoL introduces randomness for the neighborhood size of each cell at each generation
-# Probabilities and a random number [0,1] determine which neighborhood size a cell has for the generation
-# These probabilities can be adjusted according to the user, but the sum mustn't exceed 1
-# For example, if the probability of a 1-pixel neighborhood size is 0.7, then there is a 70% chance that a cell has a
-# 1-pixel neighborhood size for any generation during the simulation.
-# The initial configuration can be set by clicking/dragging cells at the start
-# Press 'd' if you want to shift into setting cells dead. Make sure to click 'd' again to switch to setting cells alive
-
 import time
 import pygame
 import numpy as np
-import random
 
 COLOR_BG = (10, 10, 10)
 COLOR_GRID = (40, 40, 40)
@@ -17,20 +8,24 @@ COLOR_DIE_NEXT = (170, 170, 170)
 COLOR_ALIVE_NEXT = (255, 255, 255)
 COLOR_DEAD = (0, 0, 0)
 
+def get_neighbor_sum(cells, row, col):
+    n_rows, n_cols = cells.shape
+    top = (row - 1) % n_rows
+    bottom = (row + 1) % n_rows
+    left = (col - 1) % n_cols
+    right = (col + 1) % n_cols
+
+    return (
+        cells[top, left] + cells[top, col] + cells[top, right] +
+        cells[row, left] + cells[row, right] +
+        cells[bottom, left] + cells[bottom, col] + cells[bottom, right]
+    )
 
 def update(screen, cells, size, with_progress=False):
-    updated_cells = np.zeros((cells.shape[0], cells.shape[1]))
+    updated_cells = np.zeros_like(cells)
 
     for row, col in np.ndindex(cells.shape):
-        if random.random() < 0.9:
-            neighborhood_size = 1
-        elif random.random() < 0.6:
-            neighborhood_size = 2
-        else:
-            neighborhood_size = 3
-
-        alive = np.sum(cells[row - neighborhood_size:row + neighborhood_size + 1,
-                        col - neighborhood_size:col + neighborhood_size + 1]) - cells[row, col]
+        alive = get_neighbor_sum(cells, row, col)
         color = COLOR_BG if cells[row, col] == 0 else COLOR_ALIVE_NEXT
 
         if cells[row, col] == 1:
@@ -41,7 +36,6 @@ def update(screen, cells, size, with_progress=False):
                 updated_cells[row, col] = 1
                 if with_progress:
                     color = COLOR_ALIVE_NEXT
-
         else:
             if alive == 3:
                 updated_cells[row, col] = 1
@@ -82,9 +76,14 @@ def main():
             if pygame.mouse.get_pressed()[0]:
                 pos = pygame.mouse.get_pos()
                 if cell_deactivation:
-                    cells[pos[1] // 10, pos[0] // 10] = 0
+                    row = pos[1] // 10
+                    col = pos[0] // 10
+                    if row >= 0 and col >= 0:
+                        cells[row, col] = 0
                 else:
-                    cells[pos[1] // 10, pos[0] // 10] = 1
+                    row = pos[1] // 10
+                    col = pos[0] // 10
+                    cells[row % cells.shape[0], col % cells.shape[1]] = 1
                 update(screen, cells, 10)
                 pygame.display.update()
 
@@ -95,7 +94,6 @@ def main():
             pygame.display.update()
 
         time.sleep(0.001)
-
 
 if __name__ == '__main__':
     main()

@@ -1,15 +1,7 @@
-# This version of GoL introduces randomness for the neighborhood size of each cell at each generation
-# Probabilities and a random number [0,1] determine which neighborhood size a cell has for the generation
-# These probabilities can be adjusted according to the user, but the sum mustn't exceed 1
-# For example, if the probability of a 1-pixel neighborhood size is 0.7, then there is a 70% chance that a cell has a
-# 1-pixel neighborhood size for any generation during the simulation.
-# The initial configuration can be set by clicking/dragging cells at the start
-# Press 'd' if you want to shift into setting cells dead. Make sure to click 'd' again to switch to setting cells alive
-
 import time
 import pygame
 import numpy as np
-import random
+import matplotlib.pyplot as plt
 
 COLOR_BG = (10, 10, 10)
 COLOR_GRID = (40, 40, 40)
@@ -17,30 +9,21 @@ COLOR_DIE_NEXT = (170, 170, 170)
 COLOR_ALIVE_NEXT = (255, 255, 255)
 COLOR_DEAD = (0, 0, 0)
 
-
 def update(screen, cells, size, with_progress=False):
     updated_cells = np.zeros((cells.shape[0], cells.shape[1]))
 
     for row, col in np.ndindex(cells.shape):
-        if random.random() < 0.9:
-            neighborhood_size = 1
-        elif random.random() < 0.6:
-            neighborhood_size = 2
-        else:
-            neighborhood_size = 3
-
-        alive = np.sum(cells[row - neighborhood_size:row + neighborhood_size + 1,
-                        col - neighborhood_size:col + neighborhood_size + 1]) - cells[row, col]
+        alive = np.sum(cells[row-1:row+2, col-1:col+2]) - cells[row, col]
         color = COLOR_BG if cells[row, col] == 0 else COLOR_ALIVE_NEXT
 
         if cells[row, col] == 1:
-            if alive < 2 or alive > 3:
-                if with_progress:
-                    color = COLOR_DIE_NEXT
-            elif 2 <= alive <= 3:
-                updated_cells[row, col] = 1
-                if with_progress:
-                    color = COLOR_ALIVE_NEXT
+           if alive < 2 or alive > 3:
+               if with_progress:
+                   color = COLOR_DIE_NEXT
+           elif 2 <= alive <= 3:
+               updated_cells[row, col] = 1
+               if with_progress:
+                   color = COLOR_ALIVE_NEXT
 
         else:
             if alive == 3:
@@ -48,7 +31,7 @@ def update(screen, cells, size, with_progress=False):
                 if with_progress:
                     color = COLOR_ALIVE_NEXT
 
-        pygame.draw.rect(screen, color, (col * size, row * size, size - 1, size - 1))
+        pygame.draw.rect(screen, color,(col * size, row * size, size -1, size - 1))
 
     return updated_cells
 
@@ -66,6 +49,7 @@ def main():
 
     running = False
     cell_deactivation = False
+    alive_percentages = []
 
     while True:
         for event in pygame.event.get():
@@ -94,8 +78,22 @@ def main():
             cells = update(screen, cells, 10, with_progress=True)
             pygame.display.update()
 
+            alive_count = np.sum(cells)
+            total_cells = cells.size
+            alive_percentage = (alive_count / total_cells) * 100
+            alive_percentages.append(alive_percentage)
+
+        if len(alive_percentages) >= 100:
+            break
+
         time.sleep(0.001)
 
+    generations = range(1, len(alive_percentages) + 1)
+    plt.plot(generations, alive_percentages)
+    plt.xlabel("Generation")
+    plt.ylabel("Percentage of Alive Cells")
+    plt.title("Game of Life Simulation")
+    plt.show()
 
 if __name__ == '__main__':
     main()
